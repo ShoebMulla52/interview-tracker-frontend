@@ -1,0 +1,194 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f5f7fb;
+  color: #212529;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navbar {
+  min-height: 64px;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.page-container {
+  padding: 24px;
+}
+
+.page-title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  color: #6c757d;
+  margin-bottom: 0;
+}
+
+/* Cards */
+
+.dashboard-card {
+  border: none;
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dashboard-card h2 {
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.dashboard-card-title {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+/* General cards */
+
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+/* Buttons */
+
+.btn {
+  border-radius: 7px;
+}
+
+.btn-primary {
+  font-weight: 500;
+}
+
+/* Tables */
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.table td {
+  font-size: 14px;
+}
+
+.table-responsive {
+  border-radius: 8px;
+}
+
+/* Form */
+
+.form-label {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.form-control,
+.form-select {
+  border-radius: 7px;
+  min-height: 40px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+}
+
+/* Login */
+
+.login-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  border-radius: 14px;
+}
+
+.login-title {
+  font-weight: 700;
+}
+
+.login-subtitle {
+  color: #6c757d;
+}
+
+/* Status */
+
+.status-badge {
+  font-size: 12px;
+  padding: 6px 9px;
+  border-radius: 20px;
+}
+
+/* Loading */
+
+.loading-container {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+  .page-container {
+    padding: 15px;
+  }
+
+  .navbar {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+
+  .table th,
+  .table td {
+    white-space: nowrap;
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .page-container {
+    padding: 12px;
+  }
+
+  .dashboard-card {
+    margin-bottom: 10px;
+  }
+
+}
