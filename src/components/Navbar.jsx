@@ -43,10 +43,18 @@ function Navbar() {
 
           <button
             type="button"
-            className="btn btn-dark me-3"
+            className="btn btn-dark me-2"
             onClick={() => navigate('/interviews')}
           >
             Interviews
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-dark me-3"
+            onClick={() => navigate('/change-password')}
+          >
+            Change Password
           </button>
 
           <span className="text-white me-3">
