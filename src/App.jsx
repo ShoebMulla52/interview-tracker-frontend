@@ -6,6 +6,7 @@ import InterviewList from './pages/InterviewList';
 import AddInterview from './pages/AddInterview';
 import InterviewDetails from './pages/InterviewDetails';
 import EditInterview from './pages/EditInterview';
+import ChangePassword from './pages/ChangePassword';
 
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -84,6 +85,17 @@ function App() {
         element={
           <ProtectedRoute>
             <InterviewDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Change Password */}
+
+      <Route
+        path="/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
           </ProtectedRoute>
         }
       />
