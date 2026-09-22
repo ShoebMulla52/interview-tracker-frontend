@@ -1,4 +1,3 @@
-
 # I brought my idea to the internet
 
 # React + Vite
