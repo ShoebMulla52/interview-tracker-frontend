@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Navbar from '../components/Navbar';
 import interviewService from '../services/interviewService';
+import api from '../services/api';
 
 function InterviewList() {
 
@@ -31,6 +32,14 @@ function InterviewList() {
   const [totalPages, setTotalPages] = useState(0);
 
   const [totalElements, setTotalElements] = useState(0);
+
+  // Candidate interview history popup
+  const [showCandidatePopup, setShowCandidatePopup] = useState(false);
+  const [candidateHistory, setCandidateHistory] = useState([]);
+  const [selectedCandidate, setSelectedCandidate] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState('');
+  const [candidateHistoryLoading, setCandidateHistoryLoading] = useState(false);
+  const [candidateHistoryError, setCandidateHistoryError] = useState('');
 
   const pageSize = 10;
 
@@ -285,6 +294,44 @@ function InterviewList() {
 
       setLoading(false);
     }
+  };
+
+  const handleCandidateClick = async (candidateName, companyName) => {
+    try {
+      setSelectedCandidate(candidateName);
+      setSelectedCompany(companyName);
+      setCandidateHistory([]);
+      setCandidateHistoryError('');
+      setShowCandidatePopup(true);
+      setCandidateHistoryLoading(true);
+
+      const response = await api.get(
+        `/interviews/candidate/${encodeURIComponent(candidateName)}/company/${encodeURIComponent(companyName)}`
+      );
+
+      setCandidateHistory(
+        Array.isArray(response.data)
+          ? response.data
+          : response.data?.data || []
+      );
+    } catch (error) {
+      console.error('CANDIDATE HISTORY ERROR:', error);
+
+      setCandidateHistoryError(
+        error.response?.data?.message ||
+        'Unable to load candidate interview history'
+      );
+    } finally {
+      setCandidateHistoryLoading(false);
+    }
+  };
+
+  const closeCandidatePopup = () => {
+    setShowCandidatePopup(false);
+    setCandidateHistory([]);
+    setSelectedCandidate('');
+    setSelectedCompany('');
+    setCandidateHistoryError('');
   };
 
   const handleDelete = async (id) => {
@@ -776,7 +823,20 @@ function InterviewList() {
                           {interview.id}
                         </td>
 
-                        <td className="fw-semibold">
+                        <td
+                          className="fw-semibold"
+                          style={{
+                            cursor: 'pointer',
+                            color: '#0d6efd',
+                          }}
+                          onClick={() =>
+                            handleCandidateClick(
+                              interview.candidateName,
+                              interview.companyName
+                            )
+                          }
+                          title="View interview rounds"
+                        >
                           {interview.candidateName}
                         </td>
 
@@ -979,6 +1039,123 @@ function InterviewList() {
         </div>
 
       </div>
+
+
+      {/* Candidate Interview History Popup */}
+      {showCandidatePopup && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.55)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1050,
+            padding: '20px',
+          }}
+          onClick={closeCandidatePopup}
+        >
+          <div
+            className="card shadow"
+            style={{
+              width: '100%',
+              maxWidth: '950px',
+              maxHeight: '85vh',
+              overflowY: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="card-header d-flex justify-content-between align-items-center">
+              <div>
+                <h5 className="mb-1 fw-bold">
+                  Interview History
+                </h5>
+                <div className="text-muted small">
+                  {selectedCandidate} — {selectedCompany}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close"
+                onClick={closeCandidatePopup}
+              ></button>
+            </div>
+
+            <div className="card-body">
+              {candidateHistoryLoading ? (
+                <div className="text-center py-4">
+                  <div
+                    className="spinner-border text-primary"
+                    role="status"
+                  >
+                    <span className="visually-hidden">
+                      Loading...
+                    </span>
+                  </div>
+                  <p className="mt-2 mb-0">
+                    Loading interview rounds...
+                  </p>
+                </div>
+              ) : candidateHistoryError ? (
+                <div className="alert alert-danger mb-0">
+                  {candidateHistoryError}
+                </div>
+              ) : candidateHistory.length === 0 ? (
+                <div className="text-center text-muted py-4">
+                  No interview rounds found.
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-bordered table-hover align-middle mb-0">
+                    <thead className="table-dark">
+                      <tr>
+                        <th>Round</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Role</th>
+                        <th>Mode</th>
+                        <th>Status</th>
+                        <th>Feedback</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {candidateHistory.map((interview) => (
+                        <tr key={interview.id}>
+                          <td>{interview.round || 'N/A'}</td>
+                          <td>{formatDate(interview.interviewDate)}</td>
+                          <td>{interview.interviewTime || 'N/A'}</td>
+                          <td>{interview.role || 'N/A'}</td>
+                          <td>{formatMode(interview.mode)}</td>
+                          <td>{getStatusBadge(interview.status)}</td>
+                          <td>{interview.feedback || 'N/A'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="card-footer text-end">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={closeCandidatePopup}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
