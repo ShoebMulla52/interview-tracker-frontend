@@ -688,7 +688,7 @@ function Dashboard() {
 
           {/* Total Interviews */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -711,7 +711,7 @@ function Dashboard() {
 
           {/* Scheduled */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -734,7 +734,7 @@ function Dashboard() {
 
           {/* Completed */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -757,7 +757,7 @@ function Dashboard() {
 
           {/* Selected */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -780,7 +780,7 @@ function Dashboard() {
 
           {/* Rejected */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -803,7 +803,7 @@ function Dashboard() {
 
           {/* On Hold */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
