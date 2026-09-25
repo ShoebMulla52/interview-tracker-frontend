@@ -243,7 +243,8 @@ function CompletionPieChart({
 }
 
 
-function SelectedPieChart({
+function StatusPieChart({
+  type,
   weekPercentage,
   monthPercentage,
   yearPercentage,
@@ -466,7 +467,7 @@ function SelectedPieChart({
               </strong>
 
               <small>
-                {item.percentage}% selected
+                {item.percentage}% {type}
               </small>
 
             </div>
@@ -582,6 +583,26 @@ function Dashboard() {
   const thisYearSelectedPercentage =
     getCompletionPercentage(
       stats?.thisYearSelected,
+      stats?.thisYear
+    );
+
+  const thisWeekRejectedPercentage =
+    getCompletionPercentage(
+      stats?.thisWeekRejected,
+      stats?.thisWeek
+    );
+
+
+  const thisMonthRejectedPercentage =
+    getCompletionPercentage(
+      stats?.thisMonthRejected,
+      stats?.thisMonth
+    );
+
+
+  const thisYearRejectedPercentage =
+    getCompletionPercentage(
+      stats?.thisYearRejected,
       stats?.thisYear
     );
 
@@ -911,7 +932,7 @@ function Dashboard() {
 
           {/* Completed Interview Percentage */}
 
-          <div className="col-lg-6">
+          <div className="col-lg-4">
 
             <div className="card shadow-sm h-100">
 
@@ -950,7 +971,7 @@ function Dashboard() {
 
           {/* Selected Interview Percentage */}
 
-          <div className="col-lg-6">
+          <div className="col-lg-4">
 
             <div className="card shadow-sm h-100">
 
@@ -968,7 +989,8 @@ function Dashboard() {
 
               <div className="card-body">
 
-                <SelectedPieChart
+                <StatusPieChart
+                  type="selected"
                   weekPercentage={
                     thisWeekSelectedPercentage
                   }
@@ -977,6 +999,44 @@ function Dashboard() {
                   }
                   yearPercentage={
                     thisYearSelectedPercentage
+                  }
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="col-lg-4">
+
+            <div className="card shadow-sm h-100">
+
+              <div className="card-header">
+
+                <h5 className="mb-1">
+                  Rejected Interview Percentage
+                </h5>
+
+                <small className="text-muted">
+                  Percentage of rejected interviews
+                </small>
+
+              </div>
+
+              <div className="card-body">
+
+                <StatusPieChart
+                  type="rejected"
+                  weekPercentage={
+                    thisWeekRejectedPercentage
+                  }
+                  monthPercentage={
+                    thisMonthRejectedPercentage
+                  }
+                  yearPercentage={
+                    thisYearRejectedPercentage
                   }
                 />
 
