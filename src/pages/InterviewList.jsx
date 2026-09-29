@@ -427,6 +427,7 @@ function InterviewList() {
         );
     }
   };
+  
 
   const formatMode = (modeValue) => {
 
@@ -725,6 +726,7 @@ function InterviewList() {
           </div>
 
         </div>
+
 
         {/* Interview Table */}
 
