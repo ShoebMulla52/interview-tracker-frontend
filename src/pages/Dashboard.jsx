@@ -3,244 +3,186 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import Navbar from '../components/Navbar';
 
-function CompletionPieChart({
-  weekPercentage,
-  monthPercentage,
-  yearPercentage,
+/* =========================================================
+   Individual Percentage Circle
+   ========================================================= */
+
+function PercentageCircle({
+  percentage,
+  label,
+  color,
+  suffix = 'completed',
 }) {
-
-  const values = [
-    {
-      label: 'This Week',
-      percentage: weekPercentage || 0,
-      color: '#0d6efd',
-    },
-    {
-      label: 'This Month',
-      percentage: monthPercentage || 0,
-      color: '#20c997',
-    },
-    {
-      label: 'This Year',
-      percentage: yearPercentage || 0,
-      color: '#fd7e14',
-    },
-  ];
-
-  const total = values.reduce(
-    (sum, item) => sum + item.percentage,
-    0
+  const safePercentage = Math.max(
+    0,
+    Math.min(100, Number(percentage) || 0)
   );
 
-  const centerX = 150;
-  const centerY = 150;
-  const radius = 115;
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
 
-  const polarToCartesian = (
-    centerX,
-    centerY,
-    radius,
-    angle
-  ) => {
-
-    const angleInRadians =
-      ((angle - 90) * Math.PI) / 180;
-
-    return {
-      x:
-        centerX +
-        radius * Math.cos(angleInRadians),
-
-      y:
-        centerY +
-        radius * Math.sin(angleInRadians),
-    };
-  };
-
-  const createSlicePath = (
-    startAngle,
-    endAngle
-  ) => {
-
-    const start =
-      polarToCartesian(
-        centerX,
-        centerY,
-        radius,
-        endAngle
-      );
-
-    const end =
-      polarToCartesian(
-        centerX,
-        centerY,
-        radius,
-        startAngle
-      );
-
-    const largeArcFlag =
-      endAngle - startAngle <= 180
-        ? 0
-        : 1;
-
-    return [
-      `M ${centerX} ${centerY}`,
-      `L ${start.x} ${start.y}`,
-      `A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
-      'Z',
-    ].join(' ');
-  };
-
-  let currentAngle = 0;
+  const progress =
+    circumference -
+    (safePercentage / 100) * circumference;
 
   return (
-    <div className="completion-pie-container">
+    <div className="percentage-circle-item">
 
-      <div className="completion-pie-chart">
+      <div className="percentage-circle-wrapper">
 
-        {total === 0 ? (
+        <svg
+          width="110"
+          height="110"
+          viewBox="0 0 110 110"
+        >
 
-          <svg
-            viewBox="0 0 300 300"
-            width="300"
-            height="300"
-          >
+          {/* Background Circle */}
+          <circle
+            cx="55"
+            cy="55"
+            r={radius}
+            fill="none"
+            stroke="#e9ecef"
+            strokeWidth="10"
+          />
 
+          {/* Progress Circle */}
+          {safePercentage > 0 && (
             <circle
-              cx="150"
-              cy="150"
-              r="115"
-              fill="#e9ecef"
-              stroke="#ffffff"
-              strokeWidth="3"
+              cx="55"
+              cy="55"
+              r={radius}
+              fill="none"
+              stroke={color}
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={progress}
+              transform="rotate(-90 55 55)"
             />
+          )}
 
-            <text
-              x="150"
-              y="158"
-              textAnchor="middle"
-              fill="#6c757d"
-              fontSize="24"
-              fontWeight="700"
-            >
-              0%
-            </text>
-
-          </svg>
-
-        ) : (
-
-          <svg
-            viewBox="0 0 300 300"
-            width="300"
-            height="300"
+          {/* Percentage Text */}
+          <text
+            x="55"
+            y="55"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="18"
+            fontWeight="700"
+            fill="#212529"
           >
+            {safePercentage}%
+          </text>
 
-            {values.map((item) => {
-
-              if (item.percentage <= 0) {
-                return null;
-              }
-
-              const sliceAngle =
-                (item.percentage / total) * 360;
-
-              const startAngle =
-                currentAngle;
-
-              const endAngle =
-                currentAngle + sliceAngle;
-
-              const midAngle =
-                startAngle +
-                sliceAngle / 2;
-
-              currentAngle = endAngle;
-
-              const textPosition =
-                polarToCartesian(
-                  centerX,
-                  centerY,
-                  72,
-                  midAngle
-                );
-
-              return (
-                <g key={item.label}>
-
-                  <path
-                    d={createSlicePath(
-                      startAngle,
-                      endAngle
-                    )}
-                    fill={item.color}
-                    stroke="#ffffff"
-                    strokeWidth="3"
-                    strokeLinejoin="round"
-                  />
-
-                  <text
-                    x={textPosition.x}
-                    y={textPosition.y}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#ffffff"
-                    fontSize="17"
-                    fontWeight="700"
-                  >
-                    {item.percentage}%
-                  </text>
-
-                </g>
-              );
-            })}
-
-          </svg>
-
-        )}
+        </svg>
 
       </div>
 
+      {/* Label */}
+      <div className="percentage-circle-label">
 
-      {/* Legend */}
+        <strong>
+          {label}
+        </strong>
 
-      <div className="completion-pie-legend">
-
-        {values.map((item) => (
-
-          <div
-            className="legend-item"
-            key={item.label}
-          >
-
-            <span
-              className="legend-dot"
-              style={{
-                backgroundColor: item.color,
-              }}
-            />
-
-            <div>
-
-              <strong>
-                {item.label}
-              </strong>
-
-              <small>
-                {item.percentage}% completed
-              </small>
-
-            </div>
-
-          </div>
-
-        ))}
+        <small>
+          {safePercentage}% {suffix}
+        </small>
 
       </div>
 
     </div>
   );
 }
+
+
+/* =========================================================
+   Common Percentage Chart
+   ========================================================= */
+
+function PercentageChart({
+  weekPercentage,
+  monthPercentage,
+  yearPercentage,
+  type = 'completed',
+}) {
+  return (
+    <div className="percentage-chart-container">
+
+      {/* This Week */}
+      <PercentageCircle
+        percentage={weekPercentage}
+        label="This Week"
+        color="#0d6efd"
+        suffix={type}
+      />
+
+      {/* This Month */}
+      <PercentageCircle
+        percentage={monthPercentage}
+        label="This Month"
+        color="#20c997"
+        suffix={type}
+      />
+
+      {/* This Year */}
+      <PercentageCircle
+        percentage={yearPercentage}
+        label="This Year"
+        color="#fd7e14"
+        suffix={type}
+      />
+
+    </div>
+  );
+}
+
+
+/* =========================================================
+   Completed Interview Percentage
+   ========================================================= */
+
+function CompletionPieChart({
+  weekPercentage,
+  monthPercentage,
+  yearPercentage,
+}) {
+  return (
+    <PercentageChart
+      weekPercentage={weekPercentage}
+      monthPercentage={monthPercentage}
+      yearPercentage={yearPercentage}
+      type="completed"
+    />
+  );
+}
+
+
+/* =========================================================
+   Selected / Rejected Percentage
+   ========================================================= */
+
+function StatusPieChart({
+  type,
+  weekPercentage,
+  monthPercentage,
+  yearPercentage,
+}) {
+  return (
+    <PercentageChart
+      weekPercentage={weekPercentage}
+      monthPercentage={monthPercentage}
+      yearPercentage={yearPercentage}
+      type={type}
+    />
+  );
+}
+
+
+/* =========================================================
+   Dashboard
+   ========================================================= */
 
 function Dashboard() {
 
@@ -250,6 +192,10 @@ function Dashboard() {
 
   const navigate = useNavigate();
 
+
+  /* =======================================================
+     Fetch Dashboard Statistics
+     ======================================================= */
 
   useEffect(() => {
     fetchDashboardStats();
@@ -292,6 +238,10 @@ function Dashboard() {
   };
 
 
+  /* =======================================================
+     Percentage Calculation
+     ======================================================= */
+
   const getCompletionPercentage = (
     completed,
     total
@@ -306,6 +256,10 @@ function Dashboard() {
     );
   };
 
+
+  /* =======================================================
+     Completed Percentages
+     ======================================================= */
 
   const thisWeekPercentage =
     getCompletionPercentage(
@@ -328,6 +282,60 @@ function Dashboard() {
     );
 
 
+  /* =======================================================
+     Selected Percentages
+     ======================================================= */
+
+  const thisWeekSelectedPercentage =
+    getCompletionPercentage(
+      stats?.thisWeekSelected,
+      stats?.thisWeek
+    );
+
+
+  const thisMonthSelectedPercentage =
+    getCompletionPercentage(
+      stats?.thisMonthSelected,
+      stats?.thisMonth
+    );
+
+
+  const thisYearSelectedPercentage =
+    getCompletionPercentage(
+      stats?.thisYearSelected,
+      stats?.thisYear
+    );
+
+
+  /* =======================================================
+     Rejected Percentages
+     ======================================================= */
+
+  const thisWeekRejectedPercentage =
+    getCompletionPercentage(
+      stats?.thisWeekRejected,
+      stats?.thisWeek
+    );
+
+
+  const thisMonthRejectedPercentage =
+    getCompletionPercentage(
+      stats?.thisMonthRejected,
+      stats?.thisMonth
+    );
+
+
+  const thisYearRejectedPercentage =
+    getCompletionPercentage(
+      stats?.thisYearRejected,
+      stats?.thisYear
+    );
+
+
+  /* =======================================================
+     Loading
+     ======================================================= */
+
   if (loading) {
 
     return (
@@ -340,11 +348,9 @@ function Dashboard() {
             className="spinner-border text-primary"
             role="status"
           >
-
             <span className="visually-hidden">
               Loading...
             </span>
-
           </div>
 
           <p className="mt-3 text-muted">
@@ -356,6 +362,10 @@ function Dashboard() {
     );
   }
 
+
+  /* =======================================================
+     Error
+     ======================================================= */
 
   if (error) {
 
@@ -383,13 +393,19 @@ function Dashboard() {
   }
 
 
+  /* =======================================================
+     Dashboard UI
+     ======================================================= */
+
   return (
     <>
       <Navbar />
 
       <div className="page-container">
 
-        {/* Dashboard Header */}
+        {/* =================================================
+            Dashboard Header
+            ================================================= */}
 
         <div className="mb-4">
 
@@ -404,13 +420,15 @@ function Dashboard() {
         </div>
 
 
-        {/* Existing Interview Status Cards */}
+        {/* =================================================
+            Existing Interview Status Cards
+            ================================================= */}
 
         <div className="row g-4 mb-4">
 
           {/* Total Interviews */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -433,7 +451,7 @@ function Dashboard() {
 
           {/* Scheduled */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -456,7 +474,7 @@ function Dashboard() {
 
           {/* Completed */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -479,7 +497,7 @@ function Dashboard() {
 
           {/* Selected */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -502,7 +520,7 @@ function Dashboard() {
 
           {/* Rejected */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -525,7 +543,7 @@ function Dashboard() {
 
           {/* On Hold */}
 
-          <div className="col-md-6 col-lg-3">
+          <div className="col-md-6 col-lg-4">
 
             <div className="card dashboard-card shadow-sm h-100">
 
@@ -548,7 +566,9 @@ function Dashboard() {
         </div>
 
 
-        {/* Interview Activity */}
+        {/* =================================================
+            Interview Activity
+            ================================================= */}
 
         <div className="mb-3">
 
@@ -648,43 +668,136 @@ function Dashboard() {
         </div>
 
 
-        {/* Completed Interview Percentage */}
+        {/* =================================================
+            Percentage Charts
+            ================================================= */}
 
-        <div className="card shadow-sm mb-4">
+        <div className="row g-4 mb-4">
 
-          <div className="card-header">
+          {/* Completed */}
 
-            <h5 className="mb-1">
-              Completed Interview Percentage
-            </h5>
+          <div className="col-lg-4">
 
-            <small className="text-muted">
-              Percentage of completed interviews
-            </small>
+            <div className="card shadow-sm h-100">
+
+              <div className="card-header">
+
+                <h5 className="mb-1">
+                  Completed Interview Percentage
+                </h5>
+
+                <small className="text-muted">
+                  Percentage of completed interviews
+                </small>
+
+              </div>
+
+              <div className="card-body">
+
+                <CompletionPieChart
+                  weekPercentage={
+                    thisWeekPercentage
+                  }
+                  monthPercentage={
+                    thisMonthPercentage
+                  }
+                  yearPercentage={
+                    thisYearPercentage
+                  }
+                />
+
+              </div>
+
+            </div>
 
           </div>
 
 
-          <div className="card-body">
+          {/* Selected */}
 
-            <CompletionPieChart
-              weekPercentage={
-                thisWeekPercentage
-              }
-              monthPercentage={
-                thisMonthPercentage
-              }
-              yearPercentage={
-                thisYearPercentage
-              }
-            />
+          <div className="col-lg-4">
+
+            <div className="card shadow-sm h-100">
+
+              <div className="card-header">
+
+                <h5 className="mb-1">
+                  Selected Interview Percentage
+                </h5>
+
+                <small className="text-muted">
+                  Percentage of selected interviews
+                </small>
+
+              </div>
+
+              <div className="card-body">
+
+                <StatusPieChart
+                  type="selected"
+                  weekPercentage={
+                    thisWeekSelectedPercentage
+                  }
+                  monthPercentage={
+                    thisMonthSelectedPercentage
+                  }
+                  yearPercentage={
+                    thisYearSelectedPercentage
+                  }
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* Rejected */}
+
+          <div className="col-lg-4">
+
+            <div className="card shadow-sm h-100">
+
+              <div className="card-header">
+
+                <h5 className="mb-1">
+                  Rejected Interview Percentage
+                </h5>
+
+                <small className="text-muted">
+                  Percentage of rejected interviews
+                </small>
+
+              </div>
+
+              <div className="card-body">
+
+                <StatusPieChart
+                  type="rejected"
+                  weekPercentage={
+                    thisWeekRejectedPercentage
+                  }
+                  monthPercentage={
+                    thisMonthRejectedPercentage
+                  }
+                  yearPercentage={
+                    thisYearRejectedPercentage
+                  }
+                />
+
+              </div>
+
+            </div>
 
           </div>
 
         </div>
 
 
-        {/* Quick Actions */}
+        {/* =================================================
+            Quick Actions
+            ================================================= */}
 
         <div className="card shadow-sm">
 

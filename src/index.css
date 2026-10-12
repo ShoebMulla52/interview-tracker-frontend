@@ -379,3 +379,18 @@ a {
   }
 
 }
+
+/*
+.completion-pie-container {
+    flex-direction: column;
+    gap: 20px;
+}
+
+.completion-pie-chart {
+    margin: auto;
+}
+
+.completion-pie-legend {
+    align-items: center;
+}
+    */
